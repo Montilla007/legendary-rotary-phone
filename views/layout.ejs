@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SocialSite</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1><a href="/">SocialSite</a></h1>
+    <nav>
+      <% if (user) { %>
+        <span>Hello, <%= user.username %></span>
+        <a href="/logout">Logout</a>
+        <% if (user.isAdmin) { %><a href="/admin">Admin</a><% } %>
+      <% } else { %>
+        <a href="/login">Login</a>
+        <a href="/signup">Sign Up</a>
+      <% } %>
+    </nav>
+  </header>

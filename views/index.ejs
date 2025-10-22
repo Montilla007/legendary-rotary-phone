@@ -1,0 +1,28 @@
+<%- include('layout') %>
+<h2>Recent Posts</h2>
+
+<% if (user) { %>
+<form action="/post" method="POST">
+  <textarea name="content" rows="3" required placeholder="What's on your mind?"></textarea>
+  <button type="submit">Post</button>
+</form>
+<% } else { %>
+<p><em>Login to create a post.</em></p>
+<% } %>
+
+<hr>
+
+<% posts.forEach(p => { %>
+  <div class="post">
+    <strong><%= p.username %></strong>:
+    <% if (INSECURE) { %>
+      <!-- vulnerable raw HTML render -->
+      <%- p.content %>
+    <% } else { %>
+      <!-- safe escaped render -->
+      <%= p.content %>
+    <% } %>
+    <br><small><%= p.created_at %></small>
+  </div>
+<% }) %>
+

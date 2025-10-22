@@ -1,0 +1,16 @@
+<%- include('layout') %>
+<h2>Secret Admin Login</h2>
+<form method="POST" action="/secret-admin">
+  <input name="username" placeholder="Admin Username" required>
+  <input type="password" name="secret" placeholder="Secret Key" required>
+  <button>Enter</button>
+</form>
+
+<% if (posts) { %>
+  <h3>All Posts (Admin View)</h3>
+  <% posts.forEach(p => { %>
+  <div class="post">
+    <strong><%= p.username %></strong>: <%= p.content %>
+  </div>
+  <% }) %>
+<% } %>
