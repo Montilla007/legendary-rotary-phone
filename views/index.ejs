@@ -1,5 +1,18 @@
 <%- include('layout') %>
-<h2>Recent Posts</h2>
+
+<% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+  <div class="search-info">
+    <h2>Search Results for: "<%- searchQuery %>"</h2>
+    <% if (posts.length > 0) { %>
+      <p>Found <%= posts.length %> post(s) by this user.</p>
+    <% } else { %>
+      <p>No posts found for this username.</p>
+    <% } %>
+    <a href="/">← Back to all posts</a>
+  </div>
+<% } else { %>
+  <h2>Recent Posts</h2>
+<% } %>
 
 <% if (user) { %>
 <form action="/post" method="POST">
@@ -12,17 +25,24 @@
 
 <hr>
 
-<% posts.forEach(p => { %>
-  <div class="post">
-    <strong><%= p.username %></strong>:
-    <% if (INSECURE) { %>
-      <!-- vulnerable raw HTML render -->
-      <%- p.content %>
-    <% } else { %>
-      <!-- safe escaped render -->
-      <%= p.content %>
-    <% } %>
-    <br><small><%= p.created_at %></small>
+<% if (posts.length === 0 && (typeof searchQuery === 'undefined' || !searchQuery)) { %>
+  <div class="no-posts">
+    <p>No posts yet. Be the first to post something!</p>
   </div>
-<% }) %>
-
+<% } else if (posts.length === 0 && searchQuery) { %>
+  <div class="no-posts">
+    <p>No posts found for username "<%= searchQuery %>".</p>
+  </div>
+<% } else { %>
+  <% posts.forEach(p => { %>
+    <div class="post">
+      <strong><%= p.username %></strong>:
+      <% if (INSECURE) { %>
+        <%- p.content %>
+      <% } else { %>
+        <%= p.content %>
+      <% } %>
+      <br><small><%= p.created_at %></small>
+    </div>
+  <% }) %>
+<% } %>
