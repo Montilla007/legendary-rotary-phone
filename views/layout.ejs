@@ -8,6 +8,16 @@
   <header>
     <h1><a href="/">SocialSite</a></h1>
     <nav>
+
+      <form action="/search" method="GET" class="search-form">
+        <input type="text" name="username" placeholder="Search by username" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+        <button type="submit">Search</button>
+        <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+          <a href="/" class="clear-search">Clear</a>
+        <% } %>
+      </form>
+
+
       <% if (user) { %>
         <span>Hello, <%= user.username %></span>
         <a href="/logout">Logout</a>
@@ -18,3 +28,5 @@
       <% } %>
     </nav>
   </header>
+</body>
+</html>

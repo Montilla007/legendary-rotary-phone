@@ -7,7 +7,51 @@ body {
 header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-form input {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 200px;
+}
+
+.search-form button {
+    padding: 5px 10px;
+    background: #551a8b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-search {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.clear-search:hover {
+    color: #333;
 }
 
 textarea {
@@ -20,4 +64,19 @@ textarea {
     padding: 8px;
     margin-bottom: 10px;
     border-radius: 6px;
+}
+
+.search-info {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border-left: 4px solid #551a8b;
+}
+
+.no-posts {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
 }

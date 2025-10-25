@@ -1,20 +1,15 @@
-// app.js
-// SocialSite - demo app with optional INSECURE stored-XSS mode.
-// WARNING: Enable INSECURE=true ONLY in a local isolated lab environment.
-
 const express = require("express");
 const session = require("express-session");
 const SQLiteStore = require("connect-sqlite3")(session);
 const bcrypt = require("bcrypt");
 const db = require("./db");
-const sanitizeHtml = require("sanitize-html"); // used when NOT insecure
-
+const sanitizeHtml = require("sanitize-html");
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// Session setup (set secure:true when using HTTPS in production)
+
 const SESSION_SECRET = process.env.SESSION_SECRET || "dev-session-secret";
 app.use(
   session({
@@ -30,15 +25,13 @@ app.use(
   })
 );
 
-// Make user available in templates
+
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
-  // Expose mode to templates so view can decide to render raw or escaped
   res.locals.INSECURE = process.env.INSECURE === "true";
   next();
 });
 
-// Basic routes
 
 app.get("/", (req, res) => {
   db.all(
@@ -47,7 +40,10 @@ app.get("/", (req, res) => {
      ORDER BY created_at DESC`,
     (err, posts) => {
       if (err) return res.status(500).send("Error loading posts.");
-      res.render("index", { posts });
+      res.render("index", { 
+        posts,
+        searchQuery: null
+      });
     }
   );
 });
@@ -93,22 +89,16 @@ app.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/"));
 });
 
-// Create post (protected)
 app.post("/post", (req, res) => {
   if (!req.session.user) return res.status(403).send("You must be logged in to post.");
   const rawContent = req.body.content || "";
-
-  // INSECURE mode: store raw content (vulnerable to stored XSS)
-  // SAFE mode (default): sanitize content before storing
   const INSECURE = process.env.INSECURE === "true";
 
   let toStore;
   if (INSECURE) {
-    // Intentionally vulnerable: store exactly what user posts (including <script> tags)
     toStore = rawContent;
     console.warn("[WARNING] INSECURE mode is ON — storing raw HTML (stored XSS vulnerability).");
   } else {
-    // Sanitize allowed HTML (keeps some safe formatting) to be conservative
     toStore = sanitizeHtml(rawContent, {
       allowedTags: ["b", "i", "em", "strong", "a", "p", "br", "ul", "ol", "li"],
       allowedAttributes: {
@@ -126,7 +116,35 @@ app.post("/post", (req, res) => {
   });
 });
 
-// Simple admin & secret-admin endpoints kept from earlier example
+app.get("/search", (req, res) => {
+  let username = req.query.username;
+  
+  if (!username) {
+    return res.redirect("/");
+  }
+
+  username = username.toString().trim();
+
+  db.all(
+    `SELECT posts.*, users.username FROM posts 
+     JOIN users ON users.id = posts.user_id 
+     WHERE users.username LIKE ? 
+     ORDER BY created_at DESC`,
+    [`%${username}%`],
+    (err, posts) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Error searching posts.");
+      }
+      
+      res.render("index", { 
+        posts, 
+        searchQuery: username
+      });
+    }
+  );
+});
+
 app.get("/admin", (req, res) => {
   if (!req.session.user || !req.session.user.isAdmin) return res.status(403).send("Access denied.");
   db.all(
